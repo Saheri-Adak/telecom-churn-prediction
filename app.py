@@ -1,4 +1,4 @@
-# ── Libraries ─────────────────────────────────────────────────
+# Libraries
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,27 +6,27 @@ import joblib
 import shap
 import matplotlib.pyplot as plt
 
-# ── Page Config ───────────────────────────────────────────────
+# Page Config
 st.set_page_config(
     page_title="Telecom Churn Predictor",
     page_icon="📡",
     layout="wide"
 )
 
-# ── Load Model ────────────────────────────────────────────────
+#  Load Model 
 @st.cache_resource
 def load_model():
     return joblib.load(r'C:\Users\ADMIN\OneDrive\Desktop\Customer Churn Prediction\Models\xgb_model.pkl')
 
 model = load_model()
 
-# ── Header ────────────────────────────────────────────────────
-st.title(" Telecom Customer Churn Predictor")
+#Header
+st.title("📡 Telecom Customer Churn Predictor")
 st.markdown("Enter customer details below to predict whether they are likely to churn.")
 st.divider()
 
-# ── Input Form ────────────────────────────────────────────────
-st.subheader(" Customer Details")
+#Input Form 
+st.subheader("👤 Customer Details")
 
 col1, col2, col3 = st.columns(3)
 
@@ -64,8 +64,8 @@ with col3:
 
 st.divider()
 
-# ── Predict Button ────────────────────────────────────────────
-if st.button(" Predict Churn", use_container_width=True, type="primary"):
+# Predict Button
+if st.button("🔮 Predict Churn", use_container_width=True, type="primary"):
 
     # Build input dataframe
     input_data = pd.DataFrame([{
@@ -94,15 +94,15 @@ if st.button(" Predict Churn", use_container_width=True, type="primary"):
     churn_prob  = model.predict_proba(input_data)[0][1]
     churn_label = "Yes" if churn_prob >= 0.5 else "No"
 
-    # ── Result ────────────────────────────────────────────────
-    st.subheader(" Prediction Result")
+    # Result 
+    st.subheader("🎯 Prediction Result")
     col1, col2 = st.columns(2)
 
     with col1:
         if churn_label == "Yes":
-            st.error(f" This customer is **likely to churn**")
+            st.error(f"⚠️ This customer is **likely to churn**")
         else:
-            st.success(f" This customer is **likely to stay**")
+            st.success(f"✅ This customer is **likely to stay**")
 
         st.metric("Churn Probability", f"{churn_prob:.1%}")
         st.progress(float(churn_prob))
@@ -121,15 +121,15 @@ if st.button(" Predict Churn", use_container_width=True, type="primary"):
         st.metric("Risk Level", risk)
         st.markdown(f"""
         **Recommended Action:**
-        {" Immediate retention offer needed!" if churn_prob >= 0.75
-         else "Schedule a follow-up call." if churn_prob >= 0.5
-         else " Send a loyalty reward." if churn_prob >= 0.25
-         else " Customer is happy — no action needed."}
+        {"🚨 Immediate retention offer needed!" if churn_prob >= 0.75
+         else "📞 Schedule a follow-up call." if churn_prob >= 0.5
+         else "📧 Send a loyalty reward." if churn_prob >= 0.25
+         else "😊 Customer is happy — no action needed."}
         """)
 
-    # ── SHAP Explanation ─────────────────────────────────────
+    #SHAP Explanation
     st.divider()
-    st.subheader(" Why This Prediction?")
+    st.subheader("🔍 Why This Prediction?")
 
     preprocessor        = model.named_steps['preprocessor']
     classifier          = model.named_steps['classifier']
