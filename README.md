@@ -212,8 +212,8 @@ print(f"Churn probability: {churn_proba}")
 
 **Saheri Adak**
 - 🎓 Second Year Data Science Student
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- GitHub: [@Saher-Adak](https://github.com/Saheri-Adak)
+- LinkedIn: [Saheri Adak]([(https://www.linkedin.com/in/saheri-adak-99290030a])
 
 ---
 
