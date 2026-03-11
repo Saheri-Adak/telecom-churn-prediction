@@ -1,6 +1,18 @@
 # 📡 Telecom Customer Churn Prediction
 
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.x-orange?logo=scikit-learn)
+![XGBoost](https://img.shields.io/badge/XGBoost-Best%20Model-green)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
+![AUC](https://img.shields.io/badge/AUC--ROC-83.5%25-blue)
+![Streamlit](https://img.shields.io/badge/Deployed-Streamlit%20Cloud-FF4B4B?logo=streamlit)
+
 > A machine learning project to predict customer churn for a telecom company — comparing **5 models** including an ensemble, achieving **83.5% AUC-ROC** on unseen data with a train-test gap of just **0.032**.
+
+## 🚀 Live Demo
+**👉 [telecom-churn-prediction-idamjfsixwwofhxver45yi.streamlit.app](https://telecom-churn-prediction-idamjfsixwwofhxver45yi.streamlit.app)**
+
+> Enter any customer's details and get an instant churn prediction with a SHAP explanation of why the model made that decision.
 
 ---
 
@@ -11,6 +23,7 @@
 - [Methodology](#-methodology)
 - [Results](#-results)
 - [Key Business Insights](#-key-business-insights)
+- [SHAP Explainability](#-shap-explainability)
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Key Learnings](#-key-learnings)
@@ -50,26 +63,39 @@ Customer churn is one of the biggest challenges in the telecom industry. Acquiri
 ## 📁 Project Structure
 
 ```
-Customer Churn Prediction/
+telecom-churn-prediction/
+│
+├── app.py                               # 🚀 Streamlit web application
+├── requirements.txt                     # Dependencies
+├── README.md
+├── .gitignore
 │
 ├── Data/
 │   ├── Raw/
-│   │   └── Telco-Customer-Churn.csv      # Original IBM dataset
+│   │   └── Telco-Customer-Churn.csv     # Original IBM dataset
 │   └── Processed/
 │       └── cleaned_customer_churn_data.csv
 │
 ├── Models/
-│   ├── preprocessor.pkl                  # ColumnTransformer pipeline
-│   ├── best_xgb_model.pkl               # Tuned Final Model
-├── Notebooks/
-│   ├── 1_Data_Cleaning.ipynb            # Data cleaning & preprocessing
-│   ├── 2_EDA.ipynb                      # Exploratory data analysis
-│   ├── 3_Feature_Engineering.ipynb      # Feature encoding & transformation
-│   ├── 4_Model_Training.ipynb           # Model training & hyperparameter tuning
+│   ├── xgb_model.pkl                    # Fitted XGBoost pipeline ⭐ Final Model
+│   └── preprocessor.pkl                 # Fitted ColumnTransformer
 │
-├── Visuals/                             # All plots and charts
-├── requirements.txt
-└── README.md
+├── Notebooks/
+│   ├── 1_Data_Cleaning_and_preprocessing.ipynb  # Data cleaning & preprocessing
+│   ├── 2_EDA.ipynb                              # Exploratory data analysis
+│   ├── 3_Feature_Engineering.ipynb              # Feature encoding & transformation
+│   ├── 4_model_training_and_Evaluation.ipynb    # Model training & tuning
+│   └── 5_shap_Analysis.ipynb                    # SHAP explainability
+│
+└── Visuals/                             # All plots and charts
+    ├── shap_summary.png
+    ├── shap_importance.png
+    ├── shap_waterfall.png
+    ├── Churn_Distribution.png
+    ├── Churn_Rate_by_Contract_Type.png
+    ├── Churn_Rate_by_Customer_Tenure_Group.png
+    ├── Correlation_Heatmap.png
+    └── ...
 ```
 
 ---
@@ -103,11 +129,14 @@ Trained and tuned **4 models** using `GridSearchCV` with 5-fold stratified cross
 
 - ✅ Random Forest
 - ✅ CatBoost
-- ✅ XGBoost
+- ✅ XGBoost ⭐ Final Model
 - ✅ LightGBM
 
 ### 5. Ensemble
 Combined top 3 models in a **Soft Voting Ensemble** with XGBoost weighted 2x due to superior individual performance.
+
+### 6. SHAP Explainability
+Applied SHAP TreeExplainer to explain model predictions globally and at the individual customer level.
 
 ---
 
@@ -155,11 +184,32 @@ weighted avg       0.79      0.75      0.76      1407
 
 ---
 
+## 🔍 SHAP Explainability
+
+SHAP (SHapley Additive exPlanations) was used to explain model predictions both globally and at the individual customer level.
+
+### Feature Importance (Mean |SHAP Value|)
+- **Tenure** — #1 most impactful feature (SHAP: ~0.49)
+- **Contract_Two year** — #2 most impactful (SHAP: ~0.44)
+- **InternetService_Fiber optic** — #3 most impactful (SHAP: ~0.35)
+
+### Key SHAP Findings
+- Low tenure customers (blue dots right) → strong push toward churn
+- Two-year contract (red dots left) → strong protection against churn
+- Fiber optic internet → increases churn risk
+- Electronic check payment → increases churn risk
+- OnlineSecurity & TechSupport → act as retention anchors
+
+### Live SHAP Waterfall
+Every prediction in the deployed app includes a **real-time SHAP waterfall plot** explaining exactly why that specific customer is predicted to churn or stay.
+
+---
+
 ## ⚙️ Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/telecom-churn-prediction.git
+git clone https://github.com/Saheri-Adak/telecom-churn-prediction.git
 cd telecom-churn-prediction
 
 # Create virtual environment
@@ -169,6 +219,9 @@ source venv/bin/activate     # Mac/Linux
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Run the app locally
+streamlit run app.py
 ```
 
 ---
@@ -180,7 +233,7 @@ import joblib
 import pandas as pd
 
 # Load the best model
-model = joblib.load('Models/best_xgb_model.pkl')
+model = joblib.load('Models/xgb_model.pkl')
 
 # Load new customer data
 new_data = pd.read_csv('Data/new_customers.csv')
@@ -199,12 +252,13 @@ print(f"Churn probability: {churn_proba}")
 - **Lower train AUC isn't always bad** — XGBoost's lower train AUC (0.867 vs 0.896) indicated better generalization, not worse performance
 - **Ensembling has limits** — combining models only helps when they make different mistakes; tree-based models tend to agree, so the ensemble added no value here
 - **Business context beats accuracy** — recall of 0.74 on churners matters more than overall accuracy; missing a churner is costlier than a false alarm
+- **Deployment reveals hidden bugs** — hardcoded paths, unfitted models, and wrong package versions only surface when you actually deploy
 
 ---
 
 ## 🛠️ Tech Stack
 
-`Python 3.11` `Scikit-Learn` `XGBoost` `LightGBM` `CatBoost` `Pandas` `NumPy` `Matplotlib` `Seaborn` `ydata-profiling` `Joblib` `SciPy`
+`Python 3.11` `Scikit-Learn` `XGBoost` `LightGBM` `CatBoost` `Pandas` `NumPy` `Matplotlib` `Seaborn` `SHAP` `Streamlit` `ydata-profiling` `Joblib` `SciPy`
 
 ---
 
@@ -212,8 +266,7 @@ print(f"Churn probability: {churn_proba}")
 
 **Saheri Adak**
 - 🎓 Second Year Data Science Student
-- GitHub: [@Saher-Adak](https://github.com/Saheri-Adak)
-- LinkedIn: [Saheri Adak]([(https://www.linkedin.com/in/saheri-adak-99290030a])
+- GitHub: [@Saheri-Adak](https://github.com/Saheri-Adak)
 
 ---
 
