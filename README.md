@@ -210,7 +210,7 @@ print(f"Churn probability: {churn_proba}")
 
 ## 👤 Author
 
-**Your Name**
+**Saheri Adak**
 - 🎓 Second Year Data Science Student
 - GitHub: [@yourusername](https://github.com/yourusername)
 - LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
